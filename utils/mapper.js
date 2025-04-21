@@ -43,23 +43,26 @@ function mapSalutation(value) {
 
   function mapEmploymentState(jobStatus) {
     const mapping = {
-      'Angestellte/r': 'EMPLOYED',
-      'Selbstständige/r': 'SELF_EMPLOYED',
+      'Angestellte/r': 'EMPLOYEE',
+      'Selbstständige/r': 'SELF_EMPLOYMENT',
       'Beamte/r': 'CIVIL_SERVANT',
-      'Rentner/in': 'RETIRED',
+      'Rentner/in': 'PENSIONER',
       'Arbeitslos': 'UNEMPLOYED',
-      'Schüler/Student': 'STUDENT'
+      'Schüler/Student': 'OTHER', // FinCRM kennt STUDENT nicht direkt ➔ "OTHER"
+      'Hausfrau/Hausmann': 'OTHER'
     };
-    return mapping[jobStatus] || null;
+    return mapping[jobStatus] || 'OTHER';
   }
+  
 
   function mapResidentialStatus(livingSituation) {
     const mapping = {
-      'Eigentum': 'OWNER',
-      'Miete': 'RENT'
+      'Eigentum': ['OWNER'],
+      'Miete': ['RENT']
     };
-    return mapping[livingSituation] || null;
+    return mapping[livingSituation] || [];
   }
+  
   
   function mapPropertyType(propertyType) {
     const mapping = {
@@ -98,19 +101,59 @@ function mapSalutation(value) {
     if (!coBorrower) return false;
     return coBorrower.includes('Ja') ? true : false;
   }
+
+  function mapPropertyTypeLead(propertyType) {
+    const mapping = {
+      'Einfamilienhaus': 'HOUSE_SINGLE_FAMILY',
+      'Doppelhaushälfte': 'HOUSE_SEMI_DETACHED',
+      'Mehrfamilienhaus': 'HOUSE_MULTI_FAMILY',
+      'Reihenhaus': 'HOUSE_ROW_MIDDLE',
+      'Reihenmittelhaus': 'HOUSE_ROW_MIDDLE',
+      'Eigentumswohnung': 'APARTMENT',
+      'Zweifamilienhaus': 'HOUSE_TWO_FAMILY',
+      'Nur Grundstück': 'PLOT'
+    };
+    return mapping[propertyType] || 'OTHER';
+  }
   
+  function mapPurposeTypeLead(financeType) {
+    const mapping = {
+      'Kauf Immobilie': 'BUY_EXISTING_PROPERTY',
+      'Anschlussfinanzierung': 'REFINANCE',
+      'Eigenes Bauvorhaben': 'CONSTRUCTION',
+      'Umbau/Modernisieren': 'MODERNIZATION'
+    };
+    return mapping[financeType] || 'BUY_EXISTING_PROPERTY';
+  }
   
+  function mapOccupationalGroup(jobStatus) {
+    const mapping = {
+      'Angestellte/r': 'EMPLOYEE',
+      'Selbstständige/r': 'SELF_EMPLOYMENT',
+      'Beamte/r': 'CIVIL_SERVANT',
+      'Rentner/in': 'PENSIONER',
+      'Arbeitslos': 'UNEMPLOYED',
+      'Schüler/Student': 'OTHER',
+      'Hausfrau/Hausmann': 'HOUSEWIFE'
+    };
+    return mapping[jobStatus] || 'OTHER';
+  }
   
   module.exports = {
+    // Vorhandene Mapper
     mapSalutation,
     mapCountry,
-    mapTitle,
     mapFinancePurpose,
     mapEmploymentState,
     mapResidentialStatus,
     mapPropertyType,
     mapPlotType,
     mapUsageType,
-    mapCoBorrower
+    mapCoBorrower,
+    
+    // NEU:
+    mapPropertyTypeLead,
+    mapPurposeTypeLead,
+    mapOccupationalGroup
   };
   

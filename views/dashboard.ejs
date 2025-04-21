@@ -49,10 +49,13 @@
             <strong><%= key %>:</strong> <%= value %>
           </li>
         <% } %>
-        <a href="/send-email/<%= lead.data.Email %>?name=<%= encodeURIComponent(lead.data.Vorname + ' ' + lead.data.Nachname) %>&ort=<%= encodeURIComponent(lead.data.Ort) %>&telefon=<%= encodeURIComponent(lead.data.Telefon) %>&leadid=<%= encodeURIComponent(lead.data.LeadID) %>" class="btn btn-primary btn-sm mt-2">
-          E-Mail schreiben an <%= lead.data.Vorname %> <%= lead.data.Nachname %>
+        <a href="/import-customer/<%= lead.data.leadId %>" class="btn btn-success btn-sm">
+          Kunde importieren
         </a>
-        <a href="/import-lead/<%= lead.data.leadId %>" class="btn btn-success btn-sm mt-2">FinCRM Import</a>
+        <a href="/import-lead/<%= lead.data.leadId %>" class="btn btn-primary btn-sm">
+          Lead importieren
+        </a>
+
 
 
         

@@ -1,8 +1,12 @@
-const { createCustomerAndPurpose } = require('../utils/fincrmApi'); // <- Wichtig
+// controllers/leadController.js
 
-exports.importLead = async (req, res) => {
+const { createCustomerAndPurpose } = require('../utils/fincrmApi');
+const { importLeadToFincrm } = require('../utils/fincrmLeadApi'); // ✨ wichtig!
+
+// 👉 Kunde importieren (Customer + Purpose)
+exports.importCustomer = async (req, res) => {
   const leadIdParam = req.params.leadId.trim();
-  
+
   const lead = global.leads.find(l => (l.data.leadId + '').trim() === leadIdParam);
 
   if (!lead) {
@@ -10,18 +14,33 @@ exports.importLead = async (req, res) => {
   }
 
   try {
-    // API-Aufruf an fincrm
     const response = await createCustomerAndPurpose(lead.data);
 
-    if (response.success) {
-      console.log(`✅ Lead erfolgreich importiert: Lead-ID ${lead.data.leadId}`);
-      res.send('✅ Lead erfolgreich importiert!');
-    } else {
-      console.error('❌ Fehler beim Import:', response.message);
-      res.send('❌ Fehler beim Import: ' + response.message);
-    }
+    console.log(`✅ Kunde erfolgreich importiert: Lead-ID ${lead.data.leadId}`);
+    res.redirect('/dashboard');
   } catch (error) {
-    console.error('❌ Fehler beim Importieren:', error.message);
-    res.send('❌ Fehler beim Importieren: ' + error.message);
+    console.error('❌ Fehler beim Kunden-Import:', error.response?.data || error.message);
+    res.send('❌ Fehler beim Kunden-Import: ' + (error.response?.data?.message || error.message));
+  }
+};
+
+// 👉 Lead importieren (nur Lead anlegen)
+exports.importLead = async (req, res) => {
+  const leadIdParam = req.params.leadId.trim();
+
+  const lead = global.leads.find(l => (l.data.leadId + '').trim() === leadIdParam);
+
+  if (!lead) {
+    return res.send('❌ Lead nicht gefunden.');
+  }
+
+  try {
+    const response = await importLeadToFincrm(lead.data);
+
+    console.log(`✅ Lead erfolgreich importiert: Lead-ID ${lead.data.leadId}`);
+    res.redirect('/dashboard');
+  } catch (error) {
+    console.error('❌ Fehler beim Lead-Import:', error.response?.data || error.message);
+    res.send('❌ Fehler beim Lead-Import: ' + (error.response?.data?.message || error.message));
   }
 };

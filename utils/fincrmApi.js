@@ -2,7 +2,7 @@
 
 const {
     mapSalutation,
-    mapCountry,
+    mapOccupationalGroup,
     mapFinancePurpose,
     mapEmploymentState,
     mapResidentialStatus,
@@ -41,7 +41,7 @@ const api = axios.create({
         city: lead.city,
         street: lead.street,
         street_number: lead.streetNumber,
-        employment_state: mapEmploymentState(lead.jobStatus),
+        occupational_group: mapOccupationalGroup(lead.jobStatus),
         residential_status: mapResidentialStatus(lead.livingSituation),
         purpose: {
           type: mapFinancePurpose(lead.financeType),
