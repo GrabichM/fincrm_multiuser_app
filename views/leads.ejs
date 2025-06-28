@@ -1,0 +1,73 @@
+<!-- views/leads.ejs -->
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Alle Leads</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container py-5">
+  <%- include('partials/header') %>
+
+  <% if (successMessage) { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <%= successMessage %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Schließen"></button>
+    </div>
+  <% } %>
+  <% if (errorMessage) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <%= errorMessage %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Schließen"></button>
+    </div>
+  <% } %>
+
+  <h1 class="mb-4">📋 Alle gespeicherten Leads</h1>
+
+  <% if (leads.length) { %>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Lead-ID</th>
+          <th>Name</th>
+          <th>E-Mail</th>
+          <th>Objekt</th>
+          <th>importiert</th>
+          <th>Mail gesendet</th>
+          <th>Kontakt am</th>
+          <th>Aktionen</th> <!-- neue Spalte -->
+        </tr>
+      </thead>
+      <tbody>
+        <% leads.forEach(l => { %>
+          <tr>
+            <td><%= l.lead_id %></td>
+            <td><%= l.salutation %> <%= l.first_name %> <%= l.last_name %></td>
+            <td><%= l.email %></td>
+            <td>
+              <%= l.property_type || '–' %> in 
+              <%= l.property_city || '–' %> 
+              (<%= l.property_postal || '–' %>)
+            </td>
+            <td><%= new Date(l.imported_at).toLocaleString() %></td>
+            <td><%= l.mail_sent_at ? new Date(l.mail_sent_at).toLocaleString() : '–' %></td>
+            <td><%= l.last_contact_at ? new Date(l.last_contact_at).toLocaleString() : '–' %></td>
+            <td>
+              <a href="/last-contact/<%= l.lead_id %>"
+                 class="btn btn-warning btn-sm">
+                Letzter Kontaktversuch
+              </a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } else { %>
+    <p>Keine Leads in der Datenbank.</p>
+  <% } %>
+
+  <a href="/dashboard" class="btn btn-secondary mt-3">← Zurück zum Dashboard</a>
+  <%- include('partials/footer') %>
+</body>
+</html>

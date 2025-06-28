@@ -1,156 +1,45 @@
-<%- include('partials/header') %>
+<!--vies/sendEmail.ejs-->
 
-<div class="container mt-5">
-  <h1>📨 E-Mail an Lead senden</h1>
-  <h2 class="mb-4">An: <%= leadName %></h2>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>E-Mail an <%= leadEmail %> senden</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container py-5">
+  <%- include('partials/header') %>
+  <h1 class="mb-4">E-Mail an <%= leadEmail %> senden</h1>
 
+  <% if (successMessage) { %>
+    <div class="alert alert-success"><%= successMessage %></div>
+  <% } %>
+  <% if (errorMessage) { %>
+    <div class="alert alert-danger"><%= errorMessage %></div>
+  <% } %>
 
-  <div class="mb-3">
-    <label for="templateSelect" class="form-label">📄 Vorlage auswählen</label>
-    <select id="templateSelect" class="form-select">
-      <option value="">-- Bitte auswählen --</option>
-      <option value="danke">Vielen Dank für Ihre Anfrage</option>
-    </select>
-  </div>
-  
-
-  <div class="row">
-    <!-- Linke Seite: TinyMCE Editor -->
-    <div class="col-md-6">
-      <form action="/send-email" method="POST">
-        <div class="mb-3">
-          <label for="subject" class="form-label">Betreff</label>
-          <input type="text" class="form-control" id="subject" name="subject" required>
-        </div>
-  
-        <div class="mb-3">
-          <label for="message" class="form-label">Nachricht</label>
-          <textarea class="form-control" id="message" name="message" rows="12" required></textarea>
-        </div>
-  
-        <!-- Versteckte Lead-Daten -->
-        <input type="hidden" name="customerName" value="<%= leadName %>">
-        <input type="hidden" name="customerOrt" value="<%= leadOrt %>">
-        <input type="hidden" name="customerTelefon" value="<%= leadTelefon %>">
-        <input type="hidden" name="customerLeadId" value="<%= leadId %>">
-  
-        <button type="submit" class="btn btn-success">E-Mail senden</button>
-        <a href="/dashboard" class="btn btn-secondary">Abbrechen</a>
-      </form>
+  <form action="/email/send" method="POST">
+    <input type="hidden" name="to"       value="<%= leadEmail %>">
+    <div class="mb-3">
+      <label class="form-label">Betreff</label>
+      <input type="text" name="subject" class="form-control" required>
     </div>
-  
-    <!-- Rechte Seite: Live-Vorschau -->
-    <div class="col-md-6">
-      <h5>📩 Live Vorschau:</h5>
-      <div id="previewBox" class="border rounded p-3 bg-white shadow-sm" style="min-height: 400px;">
-        <div id="previewContent"></div>
-      </div>
+    <div class="mb-3">
+      <label class="form-label">Nachricht</label>
+      <textarea name="message" class="form-control" rows="6" required>
+Hallo [Name],
+
+ich hoffe, es geht Ihnen gut. Hier eine ausführliche Nachricht…
+      </textarea>
     </div>
-  </div>
-</div>
+    <input type="hidden" name="customerName" value="<%= leadName %>">
+    <button type="submit" class="btn btn-primary">Senden</button>
+    <a href="/dashboard" class="btn btn-secondary ms-2">Abbrechen</a>
+  </form>
 
-<%- include('partials/footer') %>
-<script src="https://cdn.tiny.cloud/1/dnw7uo4femz7ee7qpw5xwget9rd53tmoop6zckil81lrha3s/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+  <%- include('partials/footer') %>
+</body>
+</html>
 
-<script>
-    const customerData = {
-      '[Name]': document.querySelector('input[name="customerName"]').value,
-      '[Ort]': document.querySelector('input[name="customerOrt"]').value,
-      '[Telefon]': document.querySelector('input[name="customerTelefon"]').value,
-      '[LeadID]': document.querySelector('input[name="customerLeadId"]').value
-    };
-  
-    function updatePreview() {
-      let rawHtml = tinymce.get('message').getContent();
-      for (const placeholder in customerData) {
-        rawHtml = rawHtml.replaceAll(placeholder, customerData[placeholder]);
-      }
-      document.getElementById('previewContent').innerHTML = rawHtml;
-    }
-  
-    tinymce.init({
-      selector: '#message',
-      plugins: 'lists link',
-      toolbar: 'undo redo | bold italic underline | bullist numlist | link',
-      height: 400,
-      setup: function (editor) {
-        editor.on('keyup', updatePreview);
-        editor.on('change', updatePreview);
-      }
-    });
-  </script>
-  
-  <script>
-    const templates = {
-    danke: `<table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px;">
-      <tr>
-        <td align="center">
-          <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-family: Arial, sans-serif;">
-            <tr>
-              <td style="background-color: #007BFF; padding: 20px; text-align: center;">
-                <h1 style="color: #ffffff; margin: 0;">Vielen Dank für Ihre Anfrage</h1>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding: 30px;">
-                <p style="font-size: 16px; color: #333333; margin-bottom: 20px;">Sehr geehrte/r [Name],</p>
-
-                <p style="font-size: 16px; color: #333333; margin-bottom: 20px;">
-                  wir haben Ihre Anfrage erhalten und werden uns schnellstmöglich persönlich bei Ihnen melden.
-                  Unser Team freut sich darauf, Ihnen bei Ihrem Anliegen kompetent zur Seite zu stehen.
-                </p>
-
-                <p style="font-size: 16px; color: #333333; margin-bottom: 30px;">
-                  Falls Sie zwischenzeitlich Rückfragen haben, können Sie uns jederzeit gerne kontaktieren.
-                </p>
-
-                <div style="background-color: #e9f5ff; padding: 15px; border-radius: 6px; text-align: center; margin-bottom: 30px;">
-                  <p style="margin: 0; font-size: 16px; color: #007BFF;">
-                    📞 Telefon: [Telefon]<br>
-                    📍 Standort: [Ort]
-                  </p>
-                </div>
-
-                <p style="font-size: 16px; color: #333333;">Mit freundlichen Grüßen,<br><br>
-                  Ihr Hypofact Team
-                </p>
-              </td>
-            </tr>
-            <tr>
-              <td style="background-color: #f4f4f4; text-align: center; padding: 15px; font-size: 12px; color: #999999;">
-                © 2025 Hypofact AG – Alle Rechte vorbehalten
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>`
-  };
-  
-    const templateSelect = document.getElementById('templateSelect');
-    if (templateSelect) {
-      templateSelect.addEventListener('change', function () {
-        const selectedTemplate = templates[this.value];
-        if (selectedTemplate) {
-          tinymce.get('message').setContent(selectedTemplate);
-          updatePreview(); // Vorschau direkt aktualisieren
-        }
-      });
-    }
-  
-    const previewBtn = document.getElementById('previewBtn');
-    if (previewBtn) {
-      previewBtn.addEventListener('click', function () {
-        const rawHtml = tinymce.get('message').getContent();
-        let replaced = rawHtml;
-        for (const placeholder in customerData) {
-          replaced = replaced.replaceAll(placeholder, customerData[placeholder]);
-        }
-        document.getElementById('previewContent').innerHTML = replaced;
-        document.getElementById('previewBox').style.display = 'block';
-      });
-    }
-  </script>
-  
-  
+  <!--vies/sendEmail.ejs Ende-->
 

@@ -1,0 +1,30 @@
+<!-- webmailer/views/history.ejs -->
+
+<%- include('../../views/partials/header') %>
+
+<h1 class="mb-4">📨 Gesendete E-Mails</h1>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Empfänger</th>
+      <th>Betreff</th>
+      <th>Gesendet am</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (history.length === 0) { %>
+      <tr><td colspan="3">Keine E-Mails gesendet.</td></tr>
+    <% } else { %>
+      <% history.forEach(mail => { %>
+        <tr>
+          <td><%= mail.recipient %></td>
+          <td><%= mail.subject %></td>
+          <td><%= new Date(mail.sent_at).toLocaleString() %></td>
+        </tr>
+      <% }) %>
+    <% } %>
+  </tbody>
+</table>
+
+<%- include('../../views/partials/footer') %>

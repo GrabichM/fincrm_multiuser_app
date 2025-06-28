@@ -1,0 +1,81 @@
+<!-- webmailer/views/templates.ejs -->
+
+<%- include('../partials/header') %>
+
+<h1 class="mb-4">📝 Template-Editor</h1>
+
+<!-- Template-Auswahl -->
+<div class="mb-3">
+  <label class="form-label">Vorlage auswählen</label>
+  <select id="templateSelect" class="form-select">
+    <option value="">Neue Vorlage</option>
+    <% templates.forEach(t => { %>
+      <option value="<%= t.id %>"><%= t.name %></option>
+    <% }) %>
+  </select>
+</div>
+
+<!-- Template-Formular -->
+<form action="/mailer/templates" method="POST">
+  <input type="hidden" name="id" id="templateId">
+  
+  <div class="mb-3">
+    <label class="form-label">Name der Vorlage</label>
+    <input type="text" name="name" id="templateName" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Betreff</label>
+    <input type="text" name="subject" id="templateSubject" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">HTML-Inhalt</label>
+    <textarea name="body" id="templateBody"></textarea>
+  </div>
+
+  <button type="submit" class="btn btn-success">💾 Speichern</button>
+</form>
+
+<!-- TinyMCE laden -->
+<script src="https://cdn.tiny.cloud/1/dnw7uo4femz7ee7qpw5xwget9rd53tmoop6zckil81lrha3s/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<!-- Templates JSON sauber eingebettet -->
+<script id="template-data" type="application/json">
+  <%- JSON.stringify(templates) %>
+</script>
+<script>
+  // TinyMCE Initialisierung
+  const templates = JSON.parse(document.getElementById('template-data').textContent);
+
+  tinymce.init({
+    selector: '#templateBody',
+    height: 300,
+    plugins: 'link code lists table',
+    toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link table | code',
+    menubar: false
+  });
+
+  // Element-Referenzen
+  const selectEl   = document.getElementById('templateSelect');
+  const nameEl     = document.getElementById('templateName');
+  const subjectEl  = document.getElementById('templateSubject');
+  const idEl       = document.getElementById('templateId');
+
+  selectEl.addEventListener('change', () => {
+    const tpl = templates.find(t => t.id === parseInt(selectEl.value));
+    if (tpl) {
+      idEl.value       = tpl.id;
+      nameEl.value     = tpl.name;
+      subjectEl.value  = tpl.subject;
+      tinymce.get('templateBody').setContent(tpl.body || '');
+    } else {
+      idEl.value       = '';
+      nameEl.value     = '';
+      subjectEl.value  = '';
+      tinymce.get('templateBody').setContent('');
+    }
+  });
+</script>
+
+<%- include('../partials/footer') %>
+

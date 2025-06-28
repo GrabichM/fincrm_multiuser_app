@@ -1,0 +1,121 @@
+<!-- webmailer/mailerView.ejs -->
+
+<%- include('../partials/header.ejs') %>
+
+<h1 class="mb-4">📤 Neue E-Mail versenden</h1>
+
+<% if (successMessage) { %>
+  <div class="alert alert-success"><%= successMessage %></div>
+<% } %>
+<% if (errorMessage) { %>
+  <div class="alert alert-danger"><%= errorMessage %></div>
+<% } %>
+
+<form action="/mailer/send" method="POST" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label class="form-label">Empfänger</label>
+    <input type="email" name="to" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Template auswählen</label>
+    <select id="templateSelect" class="form-select">
+      <option value="">-- Kein Template --</option>
+      <% templates.forEach(t => { %>
+        <option value="<%= t.id %>"><%= t.name %></option>
+      <% }) %>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Betreff</label>
+    <input type="text" name="subject" id="subjectInput" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+  <label class="form-label">Nachricht</label>
+  <textarea id="messageInput" name="message"></textarea>
+</div>
+
+  <div class="mb-3">
+    <label class="form-label">Platzhalter-Werte</label>
+    <div class="row">
+      <div class="col">
+        <input type="text" class="form-control" placeholder="[Name]" id="customName" name="customName">
+      </div>
+      <div class="col">
+        <input type="text" class="form-control" placeholder="[Ort]" id="customOrt" name="customOrt">
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Anhang (optional)</label>
+    <input type="file" name="attachment" class="form-control">
+  </div>
+
+  <button type="submit" class="btn btn-primary">Senden</button>
+</form>
+
+<hr class="my-4">
+
+<h3 class="mb-3">🔍 Vorschau</h3>
+<div id="previewBox" class="border rounded p-3 bg-light"></div>
+
+<script src="https://cdn.tiny.cloud/1/dnw7uo4femz7ee7qpw5xwget9rd53tmoop6zckil81lrha3s/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+<script id="template-data" type="application/json">
+  <%- JSON.stringify(templates) %>
+</script>
+
+<script>
+  const templates = JSON.parse(document.getElementById('template-data').textContent);
+
+  const selectEl   = document.getElementById('templateSelect');
+  const subjectEl  = document.getElementById('subjectInput');
+  const nameInput  = document.getElementById('customName');
+  const ortInput   = document.getElementById('customOrt');
+  const previewBox = document.getElementById('previewBox');
+
+  function updatePreview() {
+    const htmlRaw = tinymce.get('messageInput')?.getContent() || '';
+    const html = htmlRaw
+      .replace(/\[Name\]/g, nameInput.value || '[Name]')
+      .replace(/\[Ort\]/g, ortInput.value || '[Ort]');
+    previewBox.innerHTML = html;
+  }
+
+  selectEl.addEventListener('change', () => {
+    const tpl = templates.find(t => t.id === parseInt(selectEl.value));
+    if (tpl) {
+      subjectEl.value = tpl.subject;
+      tinymce.get('messageInput').setContent(tpl.body || '');
+    } else {
+      subjectEl.value = '';
+      tinymce.get('messageInput').setContent('');
+    }
+    updatePreview();
+  });
+
+  [nameInput, ortInput].forEach(el => {
+    el.addEventListener('input', updatePreview);
+  });
+
+  // Editor-Init mit Preview-Update verbinden
+  tinymce.init({
+    selector: '#messageInput',
+    height: 300,
+    plugins: 'link code lists table',
+    toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link table | code',
+    menubar: false,
+    setup: (editor) => {
+      editor.on('init', updatePreview);
+      editor.on('input', updatePreview);
+      editor.on('change', updatePreview);
+    }
+  });
+</script>
+
+<%- include('../partials/footer.ejs') %>
+
+

@@ -1,11 +1,14 @@
-const express = require('express');
-const router = express.Router();
-const { importCustomer, importLead } = require('../controllers/leadController');
+// routes/leadRoutes.js
+const express    = require('express');
+const router     = express.Router();
+const ensureAuth = require('../middleware/ensureAuth');
+const leadCtrl   = require('../controllers/leadController');
 
-// Importieren als **Kunde** (Customer + Purpose)
-router.get('/import-customer/:leadId', importCustomer);
 
-// Importieren als **Lead** (nur Lead-Objekt)
-router.get('/import-lead/:leadId', importLead);
+router.get('/import-lead/:leadId',     ensureAuth, leadCtrl.importLead);
+router.get('/test-fincrm-connection',  ensureAuth, leadCtrl.testFincrmConnection);
+router.get('/test-smtp',               ensureAuth, leadCtrl.testSmtp);
+router.get('/last-contact/:leadId',    ensureAuth, leadCtrl.lastContact);
+router.get('/leads',                   ensureAuth, leadCtrl.listLeads);
 
 module.exports = router;

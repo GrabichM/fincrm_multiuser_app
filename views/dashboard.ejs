@@ -1,3 +1,4 @@
+<!-- views/dashboard.ejs -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -7,80 +8,71 @@
 </head>
 <body class="container py-5">
   <%- include('partials/header') %>
-  <% if (typeof successMessage !== 'undefined') { %>
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
+
+  <% if (successMessage) { %>
+    <div class="alert alert-success alert-dismissible fade show">
       <%= successMessage %>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
   <% } %>
-  
-  <% if (typeof errorMessage !== 'undefined') { %>
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+  <% if (errorMessage) { %>
+    <div class="alert alert-danger alert-dismissible fade show">
       <%= errorMessage %>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
   <% } %>
-  
-    <h1 class="mb-4">👋 Willkommen im Dashboard, <%= email %>!</h1>
-    <div class="mt-4">
-      <h2>E-Mails abrufen</h2>
-      <form action="/fetch-emails" method="POST" class="row g-3">
-        <div class="col-auto">
-          <input type="date" name="sinceDate" class="form-control" required>
-        </div>
-        <div class="col-auto">
-          <button type="submit" class="btn btn-primary mb-3">E-Mails abrufen</button>
-        </div>
-      </form>
+
+  <h1 class="mb-4">👋 Willkommen, <%= email %>!</h1>
+
+  <h2>E-Mails abrufen</h2>
+  <form action="/fetch-emails" method="POST" class="row g-3 mb-4">
+    <div class="col-auto">
+      <input type="date" name="sinceDate" class="form-control" required>
     </div>
-    
-    <h2 class="mt-4">Status deiner Abfrage</h2>
-<p><%= imapStatus %></p>
-
-<h2 class="mt-4">Gefundene Leads</h2>
-
-<% if (leads.length > 0) { %>
-  <% leads.forEach(function(lead) { %>
-    <div class="card my-3 p-3">
-      <h5><%= lead.subject %> (von <%= lead.from %>)</h5>
-      <ul class="list-group mt-2">
-        <% for (const [key, value] of Object.entries(lead.data)) { %>
-          <li class="list-group-item">
-            <strong><%= key %>:</strong> <%= value %>
-          </li>
-        <% } %>
-        <a href="/import-customer/<%= lead.data.leadId %>" class="btn btn-success btn-sm">
-          Kunde importieren
-        </a>
-        <a href="/import-lead/<%= lead.data.leadId %>" class="btn btn-primary btn-sm">
-          Lead importieren
-        </a>
-
-
-
-        
-
-
-      </ul>
+    <div class="col-auto">
+      <button class="btn btn-primary">Abrufen</button>
     </div>
-  <% }); %>
-<% } else { %>
-  <p>Keine Leads gefunden.</p>
-<% } %>
+  </form>
 
+  <h2>Status</h2>
+  <p><%= imapStatus %></p>
 
-
-
-  <div class="card p-4">
-    <h2>Dein Bereich</h2>
-    <p>Hier kannst du später deine IMAP-Daten, fincrm-API-Token und persönliche Einstellungen verwalten.</p>
-
-    <div class="mt-4">
-        <a href="/settings" class="btn btn-primary">Einstellungen bearbeiten</a>
-        <a href="/logout" class="btn btn-danger ms-2">Logout</a>
+  <h2 class="mt-4">Gefundene Leads</h2>
+  <% if (leads.length) { %>
+    <% leads.forEach(lead => { %>
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">
+            <%= lead.subject %>
+            <% if (lead.inDb) { %>
+              <span class="badge bg-secondary">bereits gespeichert</span>
+            <% } %>
+          </h5>
+          <ul class="list-group list-group-flush mb-3">
+            <% Object.entries(lead.data).forEach(([k, v]) => { %>
+              <li class="list-group-item"><strong><%= k %>:</strong> <%= v %></li>
+            <% }); %>
+          </ul>
+          <a href="/import-lead/<%= lead.data.leadId %>"
+             class="btn btn-primary btn-sm me-2"
+             <%= lead.inDb ? 'disabled' : '' %>>
+            Lead importieren
+          </a>
+          <a href="/last-contact/<%= lead.data.leadId %>"
+             class="btn btn-warning btn-sm">
+            Letzter Kontaktversuch
+          </a>
+        </div>
       </div>
-  </div>
-  <%- include('partials/footer') %>
+    <% }); %>
+  <% } else { %>
+    <p>Keine Leads gefunden.</p>
+  <% } %>
 
+  <div class="mt-5">
+    <a href="/leads" class="btn btn-outline-info">Alle Leads anzeigen</a>
+  </div>
+
+  <%- include('partials/footer') %>
 </body>
 </html>

@@ -1,20 +1,34 @@
+// routes/authRoutes.js
+
+require('dotenv').config();
 const express = require('express');
-const router = express.Router();
-const authController = require('../controllers/authController');
+const router  = express.Router();
+const {
+  showRegister,
+  register,
+  showLogin,
+  login,
+  logout,
+  showDashboard
+} = require('../controllers/authController');
+const { fetchEmails } = require('../controllers/dashboardController');
+const ensureAuth = require('../middleware/ensureAuth');
 
-router.get('/register', authController.showRegister);
-router.post('/register', authController.register);
-router.get('/login', authController.showLogin);
-router.post('/login', authController.login);
-router.get('/dashboard', authController.showDashboard);
-router.get('/logout', authController.logout);
-router.get('/settings', authController.showSettings);
-router.post('/settings', authController.saveSettings);
-router.post('/fetch-emails', authController.fetchEmails);
-router.get('/send-email/:email', authController.showEmailForm);
-router.post('/send-email', authController.sendEmailToLead);
+// Registrieren
+router.get('/register', showRegister);
+router.post('/register', register);
 
+// Login
+router.get('/login', showLogin);
+router.post('/login', login);
 
+// Logout
+router.get('/logout', logout);
 
+// Dashboard und E-Mail-Fetch
+router.get('/dashboard', ensureAuth, showDashboard);
+router.post('/fetch-emails', ensureAuth, fetchEmails);
 
 module.exports = router;
+
+// routes/authRoutes.js Ende

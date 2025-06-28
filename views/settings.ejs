@@ -1,3 +1,5 @@
+<!--views/settings.ejs-->
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -9,30 +11,80 @@
   <%- include('partials/header') %>
   <h1 class="mb-4">Einstellungen bearbeiten</h1>
 
+  <% if (successMessage) { %>
+    <div class="alert alert-success"><%= successMessage %></div>
+  <% } %>
+  <% if (errorMessage) { %>
+    <div class="alert alert-danger"><%= errorMessage %></div>
+  <% } %>
+
   <form action="/settings" method="POST">
+    <!-- IMAP Einstellungen -->
     <div class="mb-3">
       <label class="form-label">IMAP Server</label>
-      <input type="text" name="imap_host" class="form-control" required>
+      <input type="text" name="imap_host" class="form-control" value="<%= user.imap_host || '' %>" required>
     </div>
     <div class="mb-3">
       <label class="form-label">IMAP Port</label>
-      <input type="number" name="imap_port" class="form-control" required>
+      <input type="number" name="imap_port" class="form-control" value="<%= user.imap_port || '' %>" required>
     </div>
     <div class="mb-3">
       <label class="form-label">IMAP Benutzer</label>
-      <input type="text" name="imap_user" class="form-control" required>
+      <input type="email" name="imap_user" class="form-control" value="<%= user.imap_user || '' %>" required>
     </div>
     <div class="mb-3">
       <label class="form-label">IMAP Passwort</label>
-      <input type="password" name="imap_password" class="form-control" required>
+      <input type="password" name="imap_password" class="form-control" placeholder="********" value="" autocomplete="new-password">
+    </div>
+
+    <!-- SMTP Einstellungen -->
+    <hr>
+    <h2 class="h5 mt-4">SMTP-Einstellungen</h2>
+    <div class="mb-3">
+      <label class="form-label">SMTP Server</label>
+      <input type="text" name="smtp_host" class="form-control" value="<%= user.smtp_host || '' %>">
     </div>
     <div class="mb-3">
-      <label class="form-label">fincrm API-Token</label>
-      <input type="text" name="fincrm_token" class="form-control" required>
+      <label class="form-label">SMTP Port</label>
+      <input type="number" name="smtp_port" class="form-control" value="<%= user.smtp_port || '' %>">
     </div>
+    <div class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" name="smtp_secure" id="smtp_secure" <%= user.smtp_secure ? 'checked' : '' %>>
+      <label class="form-check-label" for="smtp_secure">
+        TLS (secure)
+      </label>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">SMTP Benutzer</label>
+      <input type="email" name="smtp_user" class="form-control" value="<%= user.smtp_user || '' %>">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">SMTP Passwort</label>
+      <input type="password" name="smtp_pass" class="form-control" placeholder="********" value="" autocomplete="new-password">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Absender (From)</label>
+      <input type="text" name="smtp_from" class="form-control" value="<%= user.smtp_from || '' %>">
+    </div>
+
+    <!-- finCRM Einstellungen -->
+    <hr>
+    <h2 class="h5 mt-4">finCRM-API</h2>
+    <div class="mb-3">
+      <label class="form-label">Subdomain</label>
+      <input type="text" name="fincrm_subdomain" class="form-control" value="<%= user.fincrm_subdomain || '' %>" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">API-Token</label>
+      <input type="text" name="fincrm_api_token" class="form-control" placeholder="********" value="">
+    </div>
+
     <button type="submit" class="btn btn-success">Speichern</button>
     <a href="/dashboard" class="btn btn-secondary ms-2">Zurück</a>
   </form>
+
   <%- include('partials/footer') %>
 </body>
 </html>
+
+<!--views/settings.ejs Ende-->

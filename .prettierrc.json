@@ -1,0 +1,23 @@
+{
+  "plugins": ["prettier-plugin-ejs"],
+  "overrides": [
+    {
+      "files": ["**/*.js"],
+      "options": {
+        "parser": "babel"
+      }
+    },
+    {
+      "files": ["**/*.html"],
+      "options": {
+        "parser": "html"
+      }
+    },
+    {
+      "files": ["**/*.ejs"],
+      "options": {
+        "parser": "ejs"
+      }
+    }
+  ]
+}
